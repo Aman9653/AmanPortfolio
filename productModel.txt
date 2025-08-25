@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    protected $table = 'product'; // if table is singular
+    protected $fillable = ['name', 'cat', 'qty', 'price'];
+}
+  public function up(): void
+    {
+        Schema::create('product', function (Blueprint $table) {
+            $table->id();
+             $table->string('name');
+              $table->string('cat');
+               $table->integer('qty');
+               $table->double('price',10,2);
+            $table->timestamps();
+        });
+    }

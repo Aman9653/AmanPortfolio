@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use Illuminate\Http\Request;
+
+class ProductController extends Controller
+{
+    // Show all products with search + pagination
+    public function index(Request $request)
+    {
+        $query = Product::query();
+
+        // Search condition
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Get products with pagination
+        $products = $query->latest()->paginate(10);
+
+        return view('products.index', compact('products'));
+    }
+
+    // Create page
+    public function create()
+    {
+        return view('products.create');
+    }
+
+    // Store new product
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'cat'  => 'required|string',
+            'qty'  => 'required|integer',
+            'price'=> 'required|numeric'
+        ]);
+
+        Product::create($request->all());
+
+        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+    }
+
+    // Edit page
+    public function edit($id)
+    {
+        $product = Product::findOrFail($id);
+        return view('products.edit', compact('product'));
+    }
+
+    // Update product
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'cat'  => 'required|string',
+            'qty'  => 'required|integer',
+            'price'=> 'required|numeric'
+        ]);
+
+        $product = Product::findOrFail($id);
+        $product->update($request->all());
+
+        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+    }
+
+    // Delete product
+    public function destroy($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+    }
+}
